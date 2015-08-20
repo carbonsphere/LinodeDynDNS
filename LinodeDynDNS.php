@@ -32,26 +32,15 @@ class linodeAPI
 
     private $_api_url_domainid;
     private $_api_url_domainresource;
-
-    private $_api_url;
-    private $_domainid;
     private $_url_update;
-
-    private $_post_data_template = array(
-        "authenticity_token" => '',
-        "type" => 'a',
-        "name" => '',
-        "target" => '',
-        "ttl_sec" => 0
-    );
-    private $_post_data;
 
     function __construct($domainid, $resourceid)
     {
-        if (!self::KEY) {
+        if ( ! self::KEY ) {
             echo "Error: Please enter your Application key into this script.\n";
             exit;
         }
+
         if (!$domainid) {
             $domainid = self::DOMAINID;
         }
@@ -144,11 +133,11 @@ class linodeAPI
     {
         $json = json_decode($result);
 
-        foreach ( $json->ERRORARRAY as $err ) {
+        foreach ($json->ERRORARRAY as $err) {
             print "\nError Message: $err->ERRORMESSAGE\n";
         }
 
-        if(!count($json->ERRORARRAY)) {
+        if (!count($json->ERRORARRAY)) {
             print "Update Complete\n";
         }
 
