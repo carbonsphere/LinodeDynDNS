@@ -9,6 +9,7 @@ Email   : CarbonSphere@gmail.com</br>
     - DOMAINID     //Domain ID can be left empty and run through script to obtain.
     - RESOURCEID   //Resource ID can be left empty and run through script to obtain.
     - KEY          //Must obtain application key from Linode.
+    - HOSTNAME     //Ex: www.example.com
 
 > php LinodeDynDNS.php {domain id} {resource id}
 
@@ -50,5 +51,5 @@ Your public IP = 192.111.222.1
 Update Complete
 ```
 
-Domain ID and Resource ID can be inserted into LinodeDynDNS.php so you don't have to run it with arguments in cron.
+Domain ID and Resource ID can be inserted into LinodeDynDNS.php so you don't have to run it with arguments in cron. Added IP record check before update. It will update only if resolved record is different from existing public IP.
 

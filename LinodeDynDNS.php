@@ -6,7 +6,7 @@
  * Date: 8/20/15
  * Time: 12:34 PM
  * Simple Script for updating DNS records
- * Usage: 
+ * Usage:
  *   php LinodeDynDns.php {domain id} {resource id}
  *
  * If Domain ID or Resource ID is empty, then it will walk you through on obtaining your IDs by displaying
@@ -21,6 +21,7 @@ class linodeAPI
     const DOMAINID = '';
     const RESOURCEID = '';
     const KEY = '';
+    const HOSTNAME = '';
 
     const IP_URL = "http://echoip.com";
 
@@ -34,9 +35,12 @@ class linodeAPI
     private $_api_url_domainresource;
     private $_url_update;
 
+    private $_domainid;
+    private $_resourceid;
+
     function __construct($domainid, $resourceid)
     {
-        if ( ! self::KEY ) {
+        if (!self::KEY) {
             echo "Error: Please enter your Application key into this script.\n";
             exit;
         }
@@ -47,6 +51,9 @@ class linodeAPI
         if (!$resourceid) {
             $resourceid = self::RESOURCEID;
         }
+
+        $this->_domainid = $domainid;
+        $this->_resourceid = $resourceid;
 
         # Get Domain ID
         if (!$domainid) {
@@ -74,11 +81,13 @@ class linodeAPI
         # Display public IP
         print "Your public IP = $ip\n";
 
-        # Set IP
-        $this->_url_update = sprintf(self::API_URL_UPDATE, self::KEY, $domainid, $resourceid, $ip);
+        if ($this->_needUpdate($ip)) {
+            # Set IP
+            $this->_url_update = sprintf(self::API_URL_UPDATE, self::KEY, $domainid, $resourceid, $ip);
 
-        $o = $this->_getURL($this->_url_update);
-        $this->_parseUpdate($o);
+            $o = $this->_getURL($this->_url_update);
+            $this->_parseUpdate($o);
+        }
     }
 
     private function _parseDomainID($output)
@@ -121,12 +130,26 @@ class linodeAPI
         $c = curl_init($url);
         //return the transfer as a string
         curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($c, CURLOPT_ENCODING, 'gzip,deflate');
         // $output contains the output string
         $output = curl_exec($c);
         // close curl resource to free up system resources
 
         curl_close($c);
         return $output;
+    }
+
+    private function _needUpdate($ip)
+    {
+        $hostname = gethostbyname(self::HOSTNAME);
+
+        if ($hostname === $ip) {
+            echo "IP is the same, Skipping update\n";
+            return false;
+        } else {
+            echo "IP is different prepare update\n";
+            return true;
+        }
     }
 
     private function _parseUpdate($result)
